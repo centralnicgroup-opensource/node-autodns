@@ -1,6 +1,8 @@
 var expect = require('chai').expect
 
-// See AutoDNS documentation at:
+var AutoDNS = require('..')
+
+// See InternetX/AutoDNS API documentation at:
 //   https://login.autodns.com/files/downloads/1/autodns_interfacedocumentation_13.1.pdf
 
 describe('AutoDNS', function () {
@@ -31,6 +33,12 @@ describe('AutoDNS', function () {
 	context('Zone API', function () {
 		it('can create a zone', function () {
 			expect(dns).to.respondTo('createZone')
+		})
+		it('can update a zone', function () {
+			expect(dns).to.respondTo('updateZone')
+		})
+		it('can delete a zone', function () {
+			expect(dns).to.respondTo('deleteZone')
 		})
 	})
 })
