@@ -52,10 +52,11 @@ AutoDNS.prototype.setZoneSOA = function (soa) {
 AutoDNS.prototype.setZoneNameservers = function (nameservers) {
 	var zone = this.defaults.zone = this.defaults.zone || {}
 	zone.nserver = nameservers.map(function (ns) {
-		return {
-			name: ns.name || ns,
-			ttl: ns.ttl || '86400'
+		var nameserver = {
+			name: ns.name || ns
 		}
+		if (ns.ttl) nameserver.ttl = ns.ttl
+		return nameserver
 	})
 }
 

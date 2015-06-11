@@ -186,6 +186,22 @@ describe('AutoDNS', function () {
 				expect(req).to.match(/<soa>.*<ignore>0<\/ignore>.*<\/soa>/)
 				expect(req).to.not.match(/<soa>.*<email>.*<\/email>.*<\/soa>/)
 			})
+
+			it('can create a zone with nameservers', function () {
+				dns.setZoneNameservers([
+					'ns1.example.com',
+					{ name: 'ns2.example.com' },
+					{ name: 'ns3.example.com', ttl: 3600 }
+				])
+
+				var req = dns.createZone('example.com')
+
+				expectRequest(req)
+				expect(req).to.match(/<task>.*<zone>.*<\/zone>.*<\/task>/)
+				expect(req).to.match(/<zone>.*<nserver><name>ns1\.example\.com<\/name><\/nserver>.*<\/zone>/)
+				expect(req).to.match(/<zone>.*<nserver><name>ns2\.example\.com<\/name><\/nserver>.*<\/zone>/)
+				expect(req).to.match(/<zone>.*<nserver><name>ns3\.example\.com<\/name><ttl>3600<\/ttl><\/nserver>.*<\/zone>/)
+			})
 		})
 	})
 })
