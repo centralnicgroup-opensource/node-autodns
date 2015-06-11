@@ -59,13 +59,13 @@ AutoDNS.prototype.setZoneNameservers = function (nameservers) {
 
 AutoDNS.prototype.createZone = function (name, records) {
 	var zone = {
-		name: name,
-		rr: records
+		name: name
 	}
+	if (records) zone.rr = records
 
 	if ('zone' in this.defaults) {
 		var defaults = this.defaults.zone
-		['main', 'ns_main', 'nserver'].forEach(function (key) {
+		;['main', 'ns_action', 'soa', 'nserver'].forEach(function (key) {
 			if (key in defaults) {
 				zone[key] = defaults[key]
 			}
