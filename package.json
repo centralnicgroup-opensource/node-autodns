@@ -4,9 +4,15 @@
   "author": "Kevin Ingersoll <kingersoll@gmail.com>",
   "license": "MIT",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ideegeo/node-autodns.git"
+  },
   "scripts": {
     "test": "mocha",
-    "test:coverage": "istanbul cover _mocha"
+    "test:coverage": "istanbul cover _mocha",
+    "test:ci": "istanbul cover _mocha --report lcovonly",
+    "posttest:ci": "coveralls < ./coverage/lcov.info"
   },
   "dependencies": {
     "superagent": "^1.2.0",
@@ -14,6 +20,7 @@
   },
   "devDependencies": {
     "chai": "^3.0.0",
+    "coveralls": "^2.11.2",
     "istanbul": "^0.3.15",
     "mocha": "^2.2.5"
   }
