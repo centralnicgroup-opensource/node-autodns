@@ -1,9 +1,18 @@
+var xml2js = require('xml2js')
+
+
 function AutoDNS (opts) {
-	this.options = {
-		url: opts.url || 'https://gateway.autodns.com',
-		language: opts.language || 'en'
+	this.url = opts.url || 'https://gateway.autodns.com'
+	this.defaults = {
+		language: opts.language || 'en',
+		auth: {
+			user: opts.user,
+			password: opts.password
+		}
 	}
-	this.defaults = {}
+
+	this.builder = new xml2js.Builder(opts.xmlBuilder)
+	this.parser = new xml2js.Parser(opts.xmlParser)
 }
 
 
@@ -48,8 +57,31 @@ AutoDNS.prototype.setZoneNameservers = function (nameservers) {
 }
 
 
-AutoDNS.prototype.createZone = function () {
-	
+AutoDNS.prototype.createZone = function (name, records) {
+	var zone = {
+		name: name,
+		rr: records
+	}
+
+	if ('zone' in this.defaults) {
+		var defaults = this.defaults.zone
+		['main', 'ns_main', 'nserver'].forEach(function (key) {
+			if (key in defaults) {
+				zone[key] = defaults[key]
+			}
+		}.bind(this))
+	}
+
+	return this.builder.buildObject({
+		request: {
+			auth: this.defaults.auth,
+			language: this.defaults.language,
+			task: {
+				code: '0201',
+				zone: zone
+			}
+		}
+	})
 }
 
 AutoDNS.prototype.updateZone = function () {
