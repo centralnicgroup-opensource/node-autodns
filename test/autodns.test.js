@@ -91,7 +91,6 @@ describe('AutoDNS', function () {
 
 			it('can create a zone with SOA preset', function () {
 				dns.setZoneSOA({
-					level: '1',
 					email: 'hostmaster@example.com'
 				})
 
@@ -106,6 +105,25 @@ describe('AutoDNS', function () {
 				expect(req).to.not.match(/<soa>.*<refresh>.*<\/refresh>.*<\/soa>/)
 				expect(req).to.not.match(/<soa>.*<retry>.*<\/retry>.*<\/soa>/)
 				expect(req).to.not.match(/<soa>.*<expire>.*<\/expire>.*<\/soa>/)
+
+				dns.setZoneSOA({
+					level: '2',
+					email: 'hostmaster@example.com',
+					ignore: '1'
+				})
+
+				var req = dns.createZone('example.com')
+
+				expectRequest(req)
+				expect(req).to.match(/<task>.*<zone>.*<\/zone>.*<\/task>/)
+				expect(req).to.match(/<zone>.*<soa>.*<\/soa>.*<\/zone>/)
+				expect(req).to.match(/<soa>.*<level>2<\/level>.*<\/soa>/)
+				expect(req).to.match(/<soa>.*<email>hostmaster@example\.com<\/email>.*<\/soa>/)
+				expect(req).to.match(/<soa>.*<ignore>1<\/ignore>.*<\/soa>/)
+				expect(req).to.not.match(/<soa>.*<ttl>.*<\/ttl>.*<\/soa>/)
+				expect(req).to.not.match(/<soa>.*<refresh>.*<\/refresh>.*<\/soa>/)
+				expect(req).to.not.match(/<soa>.*<retry>.*<\/retry>.*<\/soa>/)
+				expect(req).to.not.match(/<soa>.*<expire>.*<\/expire>.*<\/soa>/)
 			})
 
 			it('can create a zone with custom SOA', function () {
@@ -113,8 +131,7 @@ describe('AutoDNS', function () {
 					ttl: '3600',
 					refresh: '86400',
 					retry: '7200',
-					expire: '3600000',
-					email: 'hostmaster@example.com'
+					expire: '3600000'
 				})
 
 				var req = dns.createZone('example.com')
@@ -127,7 +144,8 @@ describe('AutoDNS', function () {
 				expect(req).to.match(/<soa>.*<refresh>86400<\/refresh>.*<\/soa>/)
 				expect(req).to.match(/<soa>.*<retry>7200<\/retry>.*<\/soa>/)
 				expect(req).to.match(/<soa>.*<expire>3600000<\/expire>.*<\/soa>/)
-				expect(req).to.match(/<soa>.*<email>hostmaster@example\.com<\/email>.*<\/soa>/)
+				expect(req).to.not.match(/<soa>.*<email>.*<\/email>.*<\/soa>/)
+				expect(req).to.not.match(/<soa>.*<ignore>.*<\/ignore>.*<\/soa>/)
 			})
 
 			it('can create a zone with partial SOA', function () {
@@ -147,11 +165,11 @@ describe('AutoDNS', function () {
 				expect(req).to.match(/<soa>.*<retry>7200<\/retry>.*<\/soa>/)
 				expect(req).to.match(/<soa>.*<expire>1209600<\/expire>.*<\/soa>/)
 				expect(req).to.match(/<soa>.*<email>hostmaster@example\.com<\/email>.*<\/soa>/)
-			})
+				expect(req).to.not.match(/<soa>.*<ignore>.*<\/ignore>.*<\/soa>/)
 
-			it('can create a zone with SOA ignore option', function () {
 				dns.setZoneSOA({
-					ignore: '1'
+					retry: '600',
+					ignore: '0'
 				})
 
 				var req = dns.createZone('example.com')
@@ -162,9 +180,10 @@ describe('AutoDNS', function () {
 				expect(req).to.match(/<soa>.*<level>0<\/level>.*<\/soa>/)
 				expect(req).to.match(/<soa>.*<ttl>86400<\/ttl>.*<\/soa>/)
 				expect(req).to.match(/<soa>.*<refresh>43200<\/refresh>.*<\/soa>/)
-				expect(req).to.match(/<soa>.*<retry>7200<\/retry>.*<\/soa>/)
+				expect(req).to.match(/<soa>.*<retry>600<\/retry>.*<\/soa>/)
 				expect(req).to.match(/<soa>.*<expire>1209600<\/expire>.*<\/soa>/)
-				expect(req).to.match(/<soa>.*<ignore>1<\/ignore>.*<\/soa>/)
+				expect(req).to.match(/<soa>.*<ignore>0<\/ignore>.*<\/soa>/)
+				expect(req).to.not.match(/<soa>.*<email>.*<\/email>.*<\/soa>/)
 			})
 		})
 	})

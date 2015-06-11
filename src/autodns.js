@@ -33,13 +33,16 @@ AutoDNS.prototype.setZoneSOA = function (soa) {
 	if (+soa.level) {
 		zone.soa.level = soa.level
 	}
-	else {
-		// Recommended settings from AutoDNS docs
+	else if (soa.ttl || soa.refresh || soa.retry || soa.expire) {
 		zone.soa.level = '0'
+		// Default to recommended settings from AutoDNS docs
 		zone.soa.ttl = soa.ttl || '86400'
 		zone.soa.refresh = soa.refresh || '43200'
 		zone.soa.retry = soa.retry || '7200'
 		zone.soa.expire = soa.expire || '1209600'
+	}
+	else {
+		zone.soa.level = '1'
 	}
 
 	if ('ignore' in soa) zone.soa.ignore = soa.ignore
