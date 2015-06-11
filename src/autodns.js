@@ -50,7 +50,7 @@ AutoDNS.prototype.setZoneSOA = function (soa) {
 }
 
 AutoDNS.prototype.setZoneNameservers = function (nameservers) {
-	var zone = this.defaults.zone = this.defaults.zone || {}
+	var zone = this.defaults.zone = this.defaults.zone || /* istanbul ignore next: not sure how to cover this */ {}
 	zone.nserver = nameservers.map(function (ns) {
 		var nameserver = {
 			name: ns.name || ns
@@ -88,12 +88,14 @@ AutoDNS.prototype.createZone = function (name, records) {
 	})
 }
 
+/* istanbul ignore next */
 AutoDNS.prototype.updateZone = function () {
-	
+	// not yet implemented
 }
 
+/* istanbul ignore next */
 AutoDNS.prototype.deleteZone = function () {
-
+	// not yet implemented
 }
 
 
