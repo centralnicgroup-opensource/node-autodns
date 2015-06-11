@@ -129,6 +129,43 @@ describe('AutoDNS', function () {
 				expect(req).to.match(/<soa>.*<expire>3600000<\/expire>.*<\/soa>/)
 				expect(req).to.match(/<soa>.*<email>hostmaster@example\.com<\/email>.*<\/soa>/)
 			})
+
+			it('can create a zone with partial SOA', function () {
+				dns.setZoneSOA({
+					ttl: '3600',
+					email: 'hostmaster@example.com'
+				})
+
+				var req = dns.createZone('example.com')
+
+				expectRequest(req)
+				expect(req).to.match(/<task>.*<zone>.*<\/zone>.*<\/task>/)
+				expect(req).to.match(/<zone>.*<soa>.*<\/soa>.*<\/zone>/)
+				expect(req).to.match(/<soa>.*<level>0<\/level>.*<\/soa>/)
+				expect(req).to.match(/<soa>.*<ttl>3600<\/ttl>.*<\/soa>/)
+				expect(req).to.match(/<soa>.*<refresh>43200<\/refresh>.*<\/soa>/)
+				expect(req).to.match(/<soa>.*<retry>7200<\/retry>.*<\/soa>/)
+				expect(req).to.match(/<soa>.*<expire>1209600<\/expire>.*<\/soa>/)
+				expect(req).to.match(/<soa>.*<email>hostmaster@example\.com<\/email>.*<\/soa>/)
+			})
+
+			it('can create a zone with SOA ignore option', function () {
+				dns.setZoneSOA({
+					ignore: '1'
+				})
+
+				var req = dns.createZone('example.com')
+
+				expectRequest(req)
+				expect(req).to.match(/<task>.*<zone>.*<\/zone>.*<\/task>/)
+				expect(req).to.match(/<zone>.*<soa>.*<\/soa>.*<\/zone>/)
+				expect(req).to.match(/<soa>.*<level>0<\/level>.*<\/soa>/)
+				expect(req).to.match(/<soa>.*<ttl>86400<\/ttl>.*<\/soa>/)
+				expect(req).to.match(/<soa>.*<refresh>43200<\/refresh>.*<\/soa>/)
+				expect(req).to.match(/<soa>.*<retry>7200<\/retry>.*<\/soa>/)
+				expect(req).to.match(/<soa>.*<expire>1209600<\/expire>.*<\/soa>/)
+				expect(req).to.match(/<soa>.*<ignore>1<\/ignore>.*<\/soa>/)
+			})
 		})
 	})
 })
