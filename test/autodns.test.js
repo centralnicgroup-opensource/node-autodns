@@ -98,6 +98,7 @@ describe('AutoDNS', function () {
 
 				expectRequest(req)
 				expect(req).to.match(/<task>.*<zone>.*<\/zone>.*<\/task>/)
+				expect(req).to.match(/<zone>.*<ns_action>complete<\/ns_action>.*<\/zone>/)
 				expect(req).to.match(/<zone>.*<soa>.*<\/soa>.*<\/zone>/)
 				expect(req).to.match(/<soa>.*<level>1<\/level>.*<\/soa>/)
 				expect(req).to.match(/<soa>.*<email>hostmaster@example\.com<\/email>.*<\/soa>/)

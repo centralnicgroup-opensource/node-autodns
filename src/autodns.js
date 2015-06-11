@@ -16,14 +16,14 @@ function AutoDNS (opts) {
 }
 
 
-AutoDNS.prototype.setZoneMain = function (main) {
-	var zone = this.defaults.zone = this.defaults.zone || {}
-	zone.ns_action = zone.ns_action || 'complete'
-	zone.main = {
-		value: main.value || main,
-		ttl: main.ttl || '86400'
-	}
-}
+// AutoDNS.prototype.setZoneMain = function (main) {
+// 	var zone = this.defaults.zone = this.defaults.zone || {}
+// 	zone.ns_action = zone.ns_action || 'complete'
+// 	zone.main = {
+// 		value: main.value || main,
+// 		ttl: main.ttl || '86400'
+// 	}
+// }
 
 AutoDNS.prototype.setZoneSOA = function (soa) {
 	var zone = this.defaults.zone = this.defaults.zone || {}
