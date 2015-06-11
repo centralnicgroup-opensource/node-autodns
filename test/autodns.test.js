@@ -39,6 +39,15 @@ describe('AutoDNS', function () {
 		})
 	})
 
+
+	function expectRequest (req) {
+		expect(req).to.be.a('string')
+		expect(req).to.match(/<request>.*<auth>.*<\/auth>.*<\/request>/)
+		expect(req).to.match(/<auth>.*<user>test<\/user>.*<\/auth>/)
+		expect(req).to.match(/<auth>.*<password>test<\/password>.*<\/auth>/)
+		expect(req).to.match(/<request>.*<task>.*<\/task>.*<\/request>/)
+	}
+
 	context('Zone API', function () {
 		it('can create a zone', function () {
 			expect(dns).to.respondTo('createZone')
@@ -54,12 +63,10 @@ describe('AutoDNS', function () {
 			it('can create an empty zone', function () {
 				var req = dns.createZone('example.com')
 
-				expect(req).to.be.a('string')
-				expect(req).to.contain('<request>')
-				expect(req).to.contain('<auth><user>test</user><password>test</password></auth>')
-				expect(req).to.contain('<task>')
-				expect(req).to.contain('<code>0201</code>')
-				expect(req).to.contain('<zone><name>example.com</name></zone>')
+				expectRequest(req)
+				expect(req).to.match(/<task>.*<code>0201<\/code>.*<\/task>/)
+				expect(req).to.match(/<task>.*<zone>.*<\/zone>.*<\/task>/)
+				expect(req).to.match(/<zone>.*<name>example\.com<\/name>.*<\/zone>/)
 			})
 
 			it('can create a zone with records', function () {
@@ -74,17 +81,34 @@ describe('AutoDNS', function () {
 					value: 'mail.example.com'
 				}])
 
-				expect(req).to.be.a('string')
-				expect(req).to.contain('<request>')
-				expect(req).to.contain('<auth><user>test</user><password>test</password></auth>')
-				expect(req).to.contain('<task>')
-				expect(req).to.contain('<code>0201</code>')
-				expect(req).to.contain('<zone>')
-				expect(req).to.contain('<rr><name>www</name><type>CNAME</type><value>@</value></rr>')
-				expect(req).to.contain('<rr><name>@</name><type>MX</type><pref>10</pref><value>mail.example.com</value></rr>')
+				expectRequest(req)
+				expect(req).to.match(/<task>.*<code>0201<\/code>.*<\/task>/)
+				expect(req).to.match(/<task>.*<zone>.*<\/zone>.*<\/task>/)
+				expect(req).to.match(/<zone>.*<name>example\.com<\/name>.*<\/zone>/)
+				expect(req).to.match(/<zone>.*<rr><name>www<\/name><type>CNAME<\/type><value>@<\/value><\/rr>.*<\/zone>/)
+				expect(req).to.match(/<zone>.*<rr><name>@<\/name><type>MX<\/type><pref>10<\/pref><value>mail\.example\.com<\/value><\/rr>.*<\/zone>/)
 			})
 
-			it('can create a zone with SOA defaults', function () {
+			it('can create a zone with SOA preset', function () {
+				dns.setZoneSOA({
+					level: '1',
+					email: 'hostmaster@example.com'
+				})
+
+				var req = dns.createZone('example.com')
+
+				expectRequest(req)
+				expect(req).to.match(/<task>.*<zone>.*<\/zone>.*<\/task>/)
+				expect(req).to.match(/<zone>.*<soa>.*<\/soa>.*<\/zone>/)
+				expect(req).to.match(/<soa>.*<level>1<\/level>.*<\/soa>/)
+				expect(req).to.match(/<soa>.*<email>hostmaster@example\.com<\/email>.*<\/soa>/)
+				expect(req).to.not.match(/<soa>.*<ttl>.*<\/ttl>.*<\/soa>/)
+				expect(req).to.not.match(/<soa>.*<refresh>.*<\/refresh>.*<\/soa>/)
+				expect(req).to.not.match(/<soa>.*<retry>.*<\/retry>.*<\/soa>/)
+				expect(req).to.not.match(/<soa>.*<expire>.*<\/expire>.*<\/soa>/)
+			})
+
+			it('can create a zone with custom SOA', function () {
 				dns.setZoneSOA({
 					ttl: '3600',
 					refresh: '86400',
@@ -95,9 +119,15 @@ describe('AutoDNS', function () {
 
 				var req = dns.createZone('example.com')
 
-				expect(req).to.be.a('string')
-				expect(req).to.contain('<zone>')
-				expect(req).to.contain('<soa><level>0</level><ttl>3600</ttl><refresh>86400</refresh><retry>7200</retry><expire>3600000</expire><email>hostmaster@example.com</email></soa>')
+				expectRequest(req)
+				expect(req).to.match(/<task>.*<zone>.*<\/zone>.*<\/task>/)
+				expect(req).to.match(/<zone>.*<soa>.*<\/soa>.*<\/zone>/)
+				expect(req).to.match(/<soa>.*<level>0<\/level>.*<\/soa>/)
+				expect(req).to.match(/<soa>.*<ttl>3600<\/ttl>.*<\/soa>/)
+				expect(req).to.match(/<soa>.*<refresh>86400<\/refresh>.*<\/soa>/)
+				expect(req).to.match(/<soa>.*<retry>7200<\/retry>.*<\/soa>/)
+				expect(req).to.match(/<soa>.*<expire>3600000<\/expire>.*<\/soa>/)
+				expect(req).to.match(/<soa>.*<email>hostmaster@example\.com<\/email>.*<\/soa>/)
 			})
 		})
 	})
