@@ -77,7 +77,7 @@ describe('AutoDNS', function () {
 				}, {
 					name: '@',
 					type: 'MX',
-					pref: '10',
+					priority: '10',
 					value: 'mail.example.com'
 				}])
 
@@ -86,7 +86,7 @@ describe('AutoDNS', function () {
 				expect(req).to.match(/<task>.*<zone>.*<\/zone>.*<\/task>/)
 				expect(req).to.match(/<zone>.*<name>example\.com<\/name>.*<\/zone>/)
 				expect(req).to.match(/<zone>.*<rr><name>www<\/name><type>CNAME<\/type><value>@<\/value><\/rr>.*<\/zone>/)
-				expect(req).to.match(/<zone>.*<rr><name>@<\/name><type>MX<\/type><pref>10<\/pref><value>mail\.example\.com<\/value><\/rr>.*<\/zone>/)
+				expect(req).to.match(/<zone>.*<rr><name>@<\/name><type>MX<\/type><value>mail\.example\.com<\/value><pref>10<\/pref><\/rr>.*<\/zone>/)
 			})
 
 			it('can create a zone with SOA preset', function () {

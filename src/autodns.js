@@ -65,7 +65,18 @@ AutoDNS.prototype.createZone = function (name, records) {
 	var zone = {
 		name: name
 	}
-	if (records) zone.rr = records
+	if (records) {
+		zone.rr = records.map(function (record) {
+			var rr = {
+				name: record.name,
+				type: record.type,
+				value: record.value
+			}
+			if ('priority' in record) rr.pref = record.priority
+			if ('ttl' in record) rr.ttl = record.ttl
+			return rr
+		})
+	}
 
 	if ('zone' in this.defaults) {
 		var defaults = this.defaults.zone
