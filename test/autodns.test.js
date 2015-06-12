@@ -73,7 +73,8 @@ describe('AutoDNS', function () {
 				var req = dns.createZone('example.com', [{
 					name: 'www',
 					type: 'CNAME',
-					value: '@'
+					value: '@',
+					ttl: '3600'
 				}, {
 					name: '@',
 					type: 'MX',
@@ -85,7 +86,7 @@ describe('AutoDNS', function () {
 				expect(req).to.match(/<task>.*<code>0201<\/code>.*<\/task>/)
 				expect(req).to.match(/<task>.*<zone>.*<\/zone>.*<\/task>/)
 				expect(req).to.match(/<zone>.*<name>example\.com<\/name>.*<\/zone>/)
-				expect(req).to.match(/<zone>.*<rr><name>www<\/name><type>CNAME<\/type><value>@<\/value><\/rr>.*<\/zone>/)
+				expect(req).to.match(/<zone>.*<rr><name>www<\/name><type>CNAME<\/type><value>@<\/value><ttl>3600<\/ttl><\/rr>.*<\/zone>/)
 				expect(req).to.match(/<zone>.*<rr><name>@<\/name><type>MX<\/type><value>mail\.example\.com<\/value><pref>10<\/pref><\/rr>.*<\/zone>/)
 			})
 
