@@ -64,8 +64,8 @@ describe('AutoDNS', function () {
 	function expectRequest (req) {
 		expect(req).to.be.a('string')
 		expect(req).to.match(/<request>.*<auth>.*<\/auth>.*<\/request>/)
-		expect(req).to.match(new RegExp('<auth>.*<user>' + AUTODNS_USER + '<\/user>.*<\/auth>'))
-		expect(req).to.match(new RegExp('<auth>.*<password>' + AUTODNS_PASSWORD + '<\/password>.*<\/auth>'))
+		expect(req).to.match(new RegExp('<auth>.*<user>' + escapeRegExp(AUTODNS_USER) + '<\/user>.*<\/auth>'))
+		expect(req).to.match(new RegExp('<auth>.*<password>' + escapeRegExp(AUTODNS_PASSWORD) + '<\/password>.*<\/auth>'))
 		expect(req).to.match(/<request>.*<task>.*<\/task>.*<\/request>/)
 	}
 
