@@ -1,4 +1,6 @@
 var xml2js = require('xml2js')
+var request = require('superagent')
+var Errors = require('./errors')
 
 
 function AutoDNS (opts) {
@@ -11,8 +13,14 @@ function AutoDNS (opts) {
 		}
 	}
 
-	this.builder = new xml2js.Builder(opts.xmlBuilder)
-	this.parser = new xml2js.Parser(opts.xmlParser)
+	this.builder = new xml2js.Builder({
+		renderOpts: {
+			pretty: false
+		}
+	})
+	this.parser = new xml2js.Parser({
+		explicitArray: false
+	})
 }
 
 
@@ -61,7 +69,24 @@ AutoDNS.prototype.setZoneNameservers = function (nameservers) {
 }
 
 
-AutoDNS.prototype.createZone = function (name, records) {
+AutoDNS.prototype.request = function (data, done) {
+	var payload = this.builder.buildObject({ request: data })
+
+	request
+		.post(this.url)
+		.type('xml')
+		.send(payload)
+		.end(function (err, res) {
+			if (err) return done(err)
+			this.parser.parseString(res.text, function (err, xml) {
+				if (err) return done(err)
+				done(null, xml.response)
+			})
+		}.bind(this))
+}
+
+
+AutoDNS.prototype.createZone = function (name, records, done) {
 	var zone = {
 		name: name
 	}
@@ -87,15 +112,24 @@ AutoDNS.prototype.createZone = function (name, records) {
 		}.bind(this))
 	}
 
-	return this.builder.buildObject({
-		request: {
-			auth: this.defaults.auth,
-			language: this.defaults.language,
-			task: {
-				code: '0201',
-				zone: zone
-			}
+	return this.request({
+		auth: this.defaults.auth,
+		language: this.defaults.language,
+		task: {
+			code: '0201',
+			zone: zone
 		}
+	}, function (err, response) {
+		if (err) return done(err)
+
+		var result = response.result
+
+		if (result.status.type === 'error') {
+			err = new Errors.AutoDNSError(result.msg.code, result.msg.text, result.msg.object)
+			return done(err, result)
+		}
+
+		done(null, result)
 	})
 }
 
