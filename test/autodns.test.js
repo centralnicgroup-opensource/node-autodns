@@ -5,6 +5,7 @@ var AutoDNS = require('..')
 // See InternetX/AutoDNS API documentation at:
 //   https://login.autodns.com/files/downloads/1/autodns_interfacedocumentation_13.1.pdf
 
+var AUTODNS_URL = process.env.AUTODNS_URL || 'https://gateway.autodns.com/'
 var AUTODNS_USER = process.env.AUTODNS_USER || 'test'
 var AUTODNS_PASSWORD = process.env.AUTODNS_PASSWORD || 'test'
 
@@ -44,9 +45,10 @@ describe('AutoDNS', function () {
 			expect(dns).to.have.deep.property('defaults.language', 'en')
 		})
 
+		// set up actual AutoDNS instance for use in tests below
 		it('accepts a custom API endpoint', function () {
 			dns = new AutoDNS({
-				url: 'https://demo.autodns.com/gateway/',
+				url: AUTODNS_URL,
 				user: AUTODNS_USER,
 				password: AUTODNS_PASSWORD,
 				xmlBuilder: {
@@ -54,7 +56,7 @@ describe('AutoDNS', function () {
 				}
 			})
 			expect(dns).to.be.an.instanceOf(AutoDNS)
-			expect(dns).to.have.property('url', 'https://demo.autodns.com/gateway/')
+			expect(dns).to.have.property('url', AUTODNS_URL)
 		})
 	})
 
