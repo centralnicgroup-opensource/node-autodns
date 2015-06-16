@@ -5,6 +5,15 @@ var AutoDNS = require('..')
 // See InternetX/AutoDNS API documentation at:
 //   https://login.autodns.com/files/downloads/1/autodns_interfacedocumentation_13.1.pdf
 
+var AUTODNS_USER = process.env.AUTODNS_USER || 'test'
+var AUTODNS_PASSWORD = process.env.AUTODNS_PASSWORD || 'test'
+
+
+function escapeRegExp (str) {
+	return str.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
+}
+
+
 describe('AutoDNS', function () {
 	var dns
 
@@ -12,10 +21,7 @@ describe('AutoDNS', function () {
 		it('can be constructed', function () {
 			dns = new AutoDNS({
 				user: 'test',
-				password: 'test',
-				xmlBuilder: {
-					renderOpts: { pretty: false }
-				}
+				password: 'test'
 			})
 			expect(dns).to.be.an.instanceOf(AutoDNS)
 		})
@@ -31,11 +37,24 @@ describe('AutoDNS', function () {
 		})
 
 		it('defaults to live API endpoint', function () {
-			expect(dns).to.have.deep.property('url', 'https://gateway.autodns.com')
+			expect(dns).to.have.property('url', 'https://gateway.autodns.com/')
 		})
 
 		it('defaults to English', function () {
 			expect(dns).to.have.deep.property('defaults.language', 'en')
+		})
+
+		it('accepts a custom API endpoint', function () {
+			dns = new AutoDNS({
+				url: 'https://demo.autodns.com/gateway/',
+				user: AUTODNS_USER,
+				password: AUTODNS_PASSWORD,
+				xmlBuilder: {
+					renderOpts: { pretty: false }
+				}
+			})
+			expect(dns).to.be.an.instanceOf(AutoDNS)
+			expect(dns).to.have.property('url', 'https://demo.autodns.com/gateway/')
 		})
 	})
 
@@ -43,8 +62,8 @@ describe('AutoDNS', function () {
 	function expectRequest (req) {
 		expect(req).to.be.a('string')
 		expect(req).to.match(/<request>.*<auth>.*<\/auth>.*<\/request>/)
-		expect(req).to.match(/<auth>.*<user>test<\/user>.*<\/auth>/)
-		expect(req).to.match(/<auth>.*<password>test<\/password>.*<\/auth>/)
+		expect(req).to.match(new RegExp('<auth>.*<user>' + AUTODNS_USER + '<\/user>.*<\/auth>'))
+		expect(req).to.match(new RegExp('<auth>.*<password>' + AUTODNS_PASSWORD + '<\/password>.*<\/auth>'))
 		expect(req).to.match(/<request>.*<task>.*<\/task>.*<\/request>/)
 	}
 

@@ -2,7 +2,7 @@ var xml2js = require('xml2js')
 
 
 function AutoDNS (opts) {
-	this.url = opts.url || 'https://gateway.autodns.com'
+	this.url = opts.url || 'https://gateway.autodns.com/'
 	this.defaults = {
 		language: opts.language || 'en',
 		auth: {
