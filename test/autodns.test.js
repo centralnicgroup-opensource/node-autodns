@@ -1,4 +1,5 @@
 var expect = require('chai').expect
+var helpers = require('./helpers')
 
 var AutoDNS = require('..')
 
@@ -81,6 +82,8 @@ describe('AutoDNS', function () {
 		})
 
 		context('.createZone', function () {
+			helpers.useNockFixture('zone-create-empty.json')
+
 			it('can create an empty zone', function (done) {
 				dns.createZone('example.com', null, function (err, res) {
 					if (err) return done(err)

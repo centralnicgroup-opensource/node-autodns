@@ -9,10 +9,11 @@
     "url": "https://github.com/ideegeo/node-autodns.git"
   },
   "scripts": {
-    "test": "mocha",
-    "test:coverage": "istanbul cover _mocha",
-    "test:ci": "istanbul cover _mocha --report lcovonly",
-    "posttest:ci": "coveralls < ./coverage/lcov.info"
+    "test": "mocha test/**/*.test.js",
+    "test:coverage": "istanbul cover _mocha test/**/*.test.js",
+    "test:ci": "istanbul cover _mocha --report lcovonly test/**/*.test.js",
+    "posttest:ci": "coveralls < ./coverage/lcov.info",
+    "record-fixtures": "NOCK_BACK_MODE=record npm test"
   },
   "dependencies": {
     "superagent": "^1.2.0",
@@ -22,6 +23,7 @@
     "chai": "^3.0.0",
     "coveralls": "^2.11.2",
     "istanbul": "^0.3.15",
-    "mocha": "^2.2.5"
+    "mocha": "^2.2.5",
+    "nock": "^2.6.0"
   }
 }

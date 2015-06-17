@@ -72,6 +72,8 @@ AutoDNS.prototype.setZoneNameservers = function (nameservers) {
 AutoDNS.prototype.request = function (data, done) {
 	var payload = this.builder.buildObject({ request: data })
 
+	// TODO: set encoding to avoid gzip when NODE_ENV=test
+
 	request
 		.post(this.url)
 		.type('xml')
