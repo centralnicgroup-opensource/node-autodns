@@ -13,7 +13,9 @@
     "test:coverage": "istanbul cover _mocha test/**/*.test.js",
     "test:ci": "istanbul cover _mocha --report lcovonly test/**/*.test.js",
     "posttest:ci": "coveralls < ./coverage/lcov.info",
-    "record-fixtures": "NOCK_BACK_MODE=record npm test"
+    "prerecord-fixtures": "rm -f test/fixtures/*.json",
+    "record-fixtures": "NOCK_BACK_MODE=record npm test",
+    "postrecord-fixtures": "node test/clean-fixtures.js"
   },
   "dependencies": {
     "superagent": "^1.2.0",
@@ -22,6 +24,7 @@
   "devDependencies": {
     "chai": "^3.0.0",
     "coveralls": "^2.11.2",
+    "glob": "^5.0.10",
     "istanbul": "^0.3.15",
     "mocha": "^2.2.5",
     "nock": "^2.6.0"
