@@ -9,6 +9,7 @@ var AutoDNS = require('..')
 var AUTODNS_URL = process.env.AUTODNS_URL || 'https://gateway.autodns.com/'
 var AUTODNS_USER = process.env.AUTODNS_USER || 'test'
 var AUTODNS_PASSWORD = process.env.AUTODNS_PASSWORD || 'test'
+var AUTODNS_CONTEXT = process.env.AUTODNS_CONTEXT || '1'
 
 
 function escapeRegExp (str) {
@@ -26,7 +27,8 @@ describe('AutoDNS', function () {
 		it('can be constructed', function () {
 			dns = new AutoDNS({
 				user: 'test',
-				password: 'test'
+				password: 'test',
+				context: '1'
 			})
 			expect(dns).to.be.an.instanceOf(AutoDNS)
 		})
@@ -34,6 +36,7 @@ describe('AutoDNS', function () {
 		it('has auth data', function () {
 			expect(dns).to.have.deep.property('defaults.auth.user', 'test')
 			expect(dns).to.have.deep.property('defaults.auth.password', 'test')
+			expect(dns).to.have.deep.property('defaults.auth.context', '1')
 		})
 
 		it('has an XML builder and parser', function () {
@@ -54,7 +57,8 @@ describe('AutoDNS', function () {
 			dns = new AutoDNS({
 				url: AUTODNS_URL,
 				user: AUTODNS_USER,
-				password: AUTODNS_PASSWORD
+				password: AUTODNS_PASSWORD,
+				context: AUTODNS_CONTEXT
 			})
 			expect(dns).to.be.an.instanceOf(AutoDNS)
 			expect(dns).to.have.property('url', AUTODNS_URL)
@@ -67,6 +71,7 @@ describe('AutoDNS', function () {
 		expect(req).to.match(/<request>.*<auth>.*<\/auth>.*<\/request>/)
 		expect(req).to.match(new RegExp('<auth>.*<user>' + escapeRegExp(AUTODNS_USER) + '<\/user>.*<\/auth>'))
 		expect(req).to.match(new RegExp('<auth>.*<password>' + escapeRegExp(AUTODNS_PASSWORD) + '<\/password>.*<\/auth>'))
+		expect(req).to.match(new RegExp('<auth>.*<context>' + escapeRegExp(AUTODNS_CONTEXT) + '<\/context>.*<\/auth>'))
 		expect(req).to.match(/<request>.*<task>.*<\/task>.*<\/request>/)
 	}
 

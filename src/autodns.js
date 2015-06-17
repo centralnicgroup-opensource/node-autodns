@@ -9,7 +9,8 @@ function AutoDNS (opts) {
 		language: opts.language || 'en',
 		auth: {
 			user: opts.user,
-			password: opts.password
+			password: opts.password,
+			context: opts.context
 		}
 	}
 
@@ -72,7 +73,7 @@ AutoDNS.prototype.setZoneNameservers = function (nameservers) {
 AutoDNS.prototype.request = function (data, done) {
 	var payload = this.builder.buildObject({ request: data })
 
-	// TODO: set encoding to avoid gzip when NODE_ENV=test
+	// TODO: set encoding to avoid gzip when NODE_ENV=test or NOCK_BACK_MODE=record
 
 	request
 		.post(this.url)

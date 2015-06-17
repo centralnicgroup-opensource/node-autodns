@@ -9,7 +9,7 @@ exports.useNockFixture = function (filename) {
 	beforeEach(function (done) {
 		nock.back(filename, function (cb) {
 			nockDone = cb
-			nock.enableNetConnect()
+			nock.enableNetConnect('demo.autodns.com')
 			done()
 		})
 	})
