@@ -73,13 +73,17 @@ AutoDNS.prototype.setZoneNameservers = function (nameservers) {
 AutoDNS.prototype.request = function (data, done) {
 	var payload = this.builder.buildObject({ request: data })
 
-	// TODO: set encoding to avoid gzip when NODE_ENV=test or NOCK_BACK_MODE=record
-
-	request
+	var req = request
 		.post(this.url)
 		.type('xml')
 		.send(payload)
-		.end(function (err, res) {
+
+	if (process.env.NOCK_BACK_MODE === 'record') {
+		// remove encoding header to make Nock fixtures more readable
+		req.unset('Accept-Encoding')
+	}
+
+	req.end(function (err, res) {
 			if (err) return done(err)
 			this.parser.parseString(res.text, function (err, xml) {
 				if (err) return done(err)
