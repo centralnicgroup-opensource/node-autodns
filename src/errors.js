@@ -11,4 +11,8 @@ function AutoDNSError (code, message, object) {
 }
 util.inherits(AutoDNSError, Error)
 
+AutoDNSError.prototype.toString = function () {
+	return 'AutoDNS error #' + this.code + ': ' + this.message
+}
+
 exports.AutoDNSError = AutoDNSError
