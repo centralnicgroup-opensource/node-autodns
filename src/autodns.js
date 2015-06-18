@@ -132,7 +132,7 @@ AutoDNS.prototype.createZone = function (name, records, done) {
 		var result = response.result
 
 		if (result.status.type === 'error') {
-			err = new Errors.AutoDNSError(result.msg.code, result.msg.text, result.msg.object)
+			err = new Errors.GatewayError(result.msg.code, result.msg.text, result.msg.object)
 			return done(err, result)
 		}
 
