@@ -95,7 +95,10 @@ AutoDNS.prototype.request = function (data, done) {
 
 AutoDNS.prototype.createZone = function (name, records, done) {
 	var zone = {
-		name: name
+		name: name,
+		// set a default ns_action in case it's not added
+		// by the defaults below
+		ns_action: 'complete'
 	}
 	if (records) {
 		zone.rr = records.map(function (record) {
@@ -117,6 +120,15 @@ AutoDNS.prototype.createZone = function (name, records, done) {
 				zone[key] = defaults[key]
 			}
 		}.bind(this))
+	}
+
+	if (zone.ns_action === 'complete' || zone.ns_action === 'primary') {
+		if (!zone.soa) {
+			return done(new Error('Missing SOA for "' + zone.ns_action + '" ns_action'))
+		}
+		if (!zone.nserver) {
+			return done(new Error('Missing nameservers for "' + zone.ns_action + '" ns_action'))
+		}
 	}
 
 	return this.request({

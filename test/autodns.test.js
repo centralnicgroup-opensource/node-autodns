@@ -74,33 +74,37 @@ describe('AutoDNS', function () {
 		context('.createZone', function () {
 			helpers.useNockFixture('zone-create.json')
 
-			it('returns an error when nameservers have not been defined', function (done) {
+			it('returns an error when SOA has not been defined', function (done) {
 				dns.createZone('example.com', null, function (err, res) {
 					expect(err).to.exist
-					expect(err).to.have.property('code', 'EF02025', err.toString())
+					expect(err).to.have.property('message')
+					expect(err.message).to.contain('Missing SOA', err.toString())
+
+					dns.setZoneSOA({
+						level: '1',
+						email: 'node-autodns@devnullmail.com'
+					})
+
 					done()
 				})
 			})
 
-			it('returns an error when SOA has not been defined', function (done) {
-				dns.setZoneNameservers([
-					'a.demo.autodns.com',
-					'b.demo.autodns.com'
-				])
-
+			it('returns an error when nameservers have not been defined', function (done) {
 				dns.createZone('example.com', null, function (err, res) {
 					expect(err).to.exist
-					expect(err).to.have.property('code', 'EF02057', err.toString())
+					expect(err).to.have.property('message')
+					expect(err.message).to.contain('Missing nameservers', err.toString())
+
+					dns.setZoneNameservers([
+						'a.demo.autodns.com',
+						'b.demo.autodns.com'
+					])
+
 					done()
 				})
 			})
 
 			it('can create an empty zone', function (done) {
-				dns.setZoneSOA({
-					level: '1',
-					email: 'node-autodns@devnullmail.com'
-				})
-
 				dns.createZone('example.com', null, function (err, res) {
 					expect(err).to.not.exist
 					expect(res).to.exists
