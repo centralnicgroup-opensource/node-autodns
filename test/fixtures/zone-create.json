@@ -1,0 +1,66 @@
+[
+  {
+    "scope": "https://demo.autodns.com:443",
+    "method": "POST",
+    "path": "/gateway/",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><request><auth><user>test</user><password>test</password><context>1</context></auth><language>en</language><task><code>0201</code><zone><name>example.com</name></zone></task></request>",
+    "status": 200,
+    "response": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><response><result><data/><msg><text>We dont administrate any of the entered nameservers.</text><code>EF02025</code><type>error</type></msg><status><code>E0201</code><text>Zone could not be recorded on the nameserver.</text><type>error</type><object><type>zone</type><value>example.com</value></object></status></result><stid>20150618-app1-demo-511</stid></response>",
+    "headers": {
+      "server": "nginx",
+      "date": "Thu, 18 Jun 2015 00:26:40 GMT",
+      "content-type": "text/xml",
+      "transfer-encoding": "chunked",
+      "connection": "close",
+      "vary": "Accept-Encoding"
+    }
+  },
+  {
+    "scope": "https://demo.autodns.com:443",
+    "method": "POST",
+    "path": "/gateway/",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><request><auth><user>test</user><password>test</password><context>1</context></auth><language>en</language><task><code>0201</code><zone><name>example.com</name><nserver><name>a.demo.autodns.com</name></nserver><nserver><name>b.demo.autodns.com</name></nserver></zone></task></request>",
+    "status": 200,
+    "response": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><response><result><data/><msg><text>The entered nameserver mode can not be used for these nameservers.</text><code>EF02057</code><type>error</type><object><type>ns_action</type><value>COMPLETE</value></object></msg><status><code>E0201</code><text>Zone could not be recorded on the nameserver.</text><type>error</type><object><type>zone</type><value>example.com</value></object></status></result><stid>20150618-app1-demo-512</stid></response>",
+    "headers": {
+      "server": "nginx",
+      "date": "Thu, 18 Jun 2015 00:26:41 GMT",
+      "content-type": "text/xml",
+      "transfer-encoding": "chunked",
+      "connection": "close",
+      "vary": "Accept-Encoding"
+    }
+  },
+  {
+    "scope": "https://demo.autodns.com:443",
+    "method": "POST",
+    "path": "/gateway/",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><request><auth><user>test</user><password>test</password><context>1</context></auth><language>en</language><task><code>0201</code><zone><name>example.com</name><ns_action>complete</ns_action><soa><level>1</level><email>node-autodns@devnullmail.com</email></soa><nserver><name>a.demo.autodns.com</name></nserver><nserver><name>b.demo.autodns.com</name></nserver></zone></task></request>",
+    "status": 200,
+    "response": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><response><result><data/><status><code>S0201</code><text>Zone has been stored successfully on the nameserver.</text><type>success</type><object><type>zone</type><value>example.com</value></object></status></result><stid>20150618-app1-demo-513</stid></response>",
+    "headers": {
+      "server": "nginx",
+      "date": "Thu, 18 Jun 2015 00:26:42 GMT",
+      "content-type": "text/xml",
+      "transfer-encoding": "chunked",
+      "connection": "close",
+      "vary": "Accept-Encoding"
+    }
+  },
+  {
+    "scope": "https://demo.autodns.com:443",
+    "method": "POST",
+    "path": "/gateway/",
+    "body": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><request><auth><user>test</user><password>test</password><context>1</context></auth><language>en</language><task><code>0201</code><zone><name>example.com</name><ns_action>complete</ns_action><soa><level>1</level><email>node-autodns@devnullmail.com</email></soa><nserver><name>a.demo.autodns.com</name></nserver><nserver><name>b.demo.autodns.com</name></nserver></zone></task></request>",
+    "status": 200,
+    "response": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><response><result><data/><msg><text>Duplicate zone entry.</text><code>EF02019</code><type>error</type><object><type>zone</type><value>example.com</value></object></msg><status><code>E0201</code><text>Zone could not be recorded on the nameserver.</text><type>error</type><object><type>zone</type><value>example.com</value></object></status></result><stid>20150618-app1-demo-514</stid></response>",
+    "headers": {
+      "server": "nginx",
+      "date": "Thu, 18 Jun 2015 00:26:43 GMT",
+      "content-type": "text/xml",
+      "transfer-encoding": "chunked",
+      "connection": "close",
+      "vary": "Accept-Encoding"
+    }
+  }
+]

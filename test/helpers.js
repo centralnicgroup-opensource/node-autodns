@@ -6,15 +6,15 @@ exports.useNockFixture = function (filename) {
 
 	nock.back.fixtures = path.join(__dirname, 'fixtures')
 
-	beforeEach(function (done) {
+	before(function (done) {
 		nock.back(filename, function (cb) {
 			nockDone = cb
-			nock.enableNetConnect('demo.autodns.com')
+			nock.enableNetConnect()
 			done()
 		})
 	})
 
-	afterEach(function () {
+	after(function () {
 		nockDone()
 	})
 }

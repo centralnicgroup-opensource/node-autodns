@@ -6,15 +6,10 @@ var AutoDNS = require('..')
 // See InternetX/AutoDNS API documentation at:
 //   https://login.autodns.com/files/downloads/1/autodns_interfacedocumentation_13.1.pdf
 
-var AUTODNS_URL = process.env.AUTODNS_URL || 'https://gateway.autodns.com/'
+var AUTODNS_URL = process.env.AUTODNS_URL || 'https://demo.autodns.com/gateway/'
 var AUTODNS_USER = process.env.AUTODNS_USER || 'test'
 var AUTODNS_PASSWORD = process.env.AUTODNS_PASSWORD || 'test'
 var AUTODNS_CONTEXT = process.env.AUTODNS_CONTEXT || '1'
-
-
-function escapeRegExp (str) {
-	return str.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
-}
 
 
 describe('AutoDNS', function () {
@@ -27,8 +22,7 @@ describe('AutoDNS', function () {
 		it('can be constructed', function () {
 			dns = new AutoDNS({
 				user: 'test',
-				password: 'test',
-				context: '1'
+				password: 'test'
 			})
 			expect(dns).to.be.an.instanceOf(AutoDNS)
 		})
@@ -66,16 +60,7 @@ describe('AutoDNS', function () {
 	})
 
 
-	function expectRequest (req) {
-		expect(req).to.be.a('string')
-		expect(req).to.match(/<request>.*<auth>.*<\/auth>.*<\/request>/)
-		expect(req).to.match(new RegExp('<auth>.*<user>' + escapeRegExp(AUTODNS_USER) + '<\/user>.*<\/auth>'))
-		expect(req).to.match(new RegExp('<auth>.*<password>' + escapeRegExp(AUTODNS_PASSWORD) + '<\/password>.*<\/auth>'))
-		expect(req).to.match(new RegExp('<auth>.*<context>' + escapeRegExp(AUTODNS_CONTEXT) + '<\/context>.*<\/auth>'))
-		expect(req).to.match(/<request>.*<task>.*<\/task>.*<\/request>/)
-	}
-
-	context('Zone API', function () {
+	describe('Zone API', function () {
 		it('can create a zone', function () {
 			expect(dns).to.respondTo('createZone')
 		})
@@ -87,160 +72,49 @@ describe('AutoDNS', function () {
 		})
 
 		context('.createZone', function () {
-			helpers.useNockFixture('zone-create-empty.json')
+			helpers.useNockFixture('zone-create.json')
 
-			it('can create an empty zone', function (done) {
+			it('returns an error when nameservers have not been defined', function (done) {
 				dns.createZone('example.com', null, function (err, res) {
-					if (err) return done(err)
-
+					expect(err).to.exist
+					expect(err).to.have.property('code', 'EF02025', err.toString())
 					done()
 				})
-
-				return
-				expectRequest(req)
-				expect(req).to.match(/<task>.*<code>0201<\/code>.*<\/task>/)
-				expect(req).to.match(/<task>.*<zone>.*<\/zone>.*<\/task>/)
-				expect(req).to.match(/<zone>.*<name>example\.com<\/name>.*<\/zone>/)
 			})
 
-			it('can create a zone with records', function () {
-				return
-				var req = dns.createZone('example.com', [{
-					name: 'www',
-					type: 'CNAME',
-					value: '@',
-					ttl: '3600'
-				}, {
-					name: '@',
-					type: 'MX',
-					priority: '10',
-					value: 'mail.example.com'
-				}])
-
-				expectRequest(req)
-				expect(req).to.match(/<task>.*<code>0201<\/code>.*<\/task>/)
-				expect(req).to.match(/<task>.*<zone>.*<\/zone>.*<\/task>/)
-				expect(req).to.match(/<zone>.*<name>example\.com<\/name>.*<\/zone>/)
-				expect(req).to.match(/<zone>.*<rr><name>www<\/name><type>CNAME<\/type><value>@<\/value><ttl>3600<\/ttl><\/rr>.*<\/zone>/)
-				expect(req).to.match(/<zone>.*<rr><name>@<\/name><type>MX<\/type><value>mail\.example\.com<\/value><pref>10<\/pref><\/rr>.*<\/zone>/)
-			})
-
-			it('can create a zone with SOA preset', function () {
-				return
-				dns.setZoneSOA({
-					email: 'hostmaster@example.com'
-				})
-
-				var req = dns.createZone('example.com')
-
-				expectRequest(req)
-				expect(req).to.match(/<task>.*<zone>.*<\/zone>.*<\/task>/)
-				expect(req).to.match(/<zone>.*<ns_action>complete<\/ns_action>.*<\/zone>/)
-				expect(req).to.match(/<zone>.*<soa>.*<\/soa>.*<\/zone>/)
-				expect(req).to.match(/<soa>.*<level>1<\/level>.*<\/soa>/)
-				expect(req).to.match(/<soa>.*<email>hostmaster@example\.com<\/email>.*<\/soa>/)
-				expect(req).to.not.match(/<soa>.*<ttl>.*<\/ttl>.*<\/soa>/)
-				expect(req).to.not.match(/<soa>.*<refresh>.*<\/refresh>.*<\/soa>/)
-				expect(req).to.not.match(/<soa>.*<retry>.*<\/retry>.*<\/soa>/)
-				expect(req).to.not.match(/<soa>.*<expire>.*<\/expire>.*<\/soa>/)
-
-				dns.setZoneSOA({
-					level: '2',
-					email: 'hostmaster@example.com',
-					ignore: '1'
-				})
-
-				var req = dns.createZone('example.com')
-
-				expectRequest(req)
-				expect(req).to.match(/<task>.*<zone>.*<\/zone>.*<\/task>/)
-				expect(req).to.match(/<zone>.*<soa>.*<\/soa>.*<\/zone>/)
-				expect(req).to.match(/<soa>.*<level>2<\/level>.*<\/soa>/)
-				expect(req).to.match(/<soa>.*<email>hostmaster@example\.com<\/email>.*<\/soa>/)
-				expect(req).to.match(/<soa>.*<ignore>1<\/ignore>.*<\/soa>/)
-				expect(req).to.not.match(/<soa>.*<ttl>.*<\/ttl>.*<\/soa>/)
-				expect(req).to.not.match(/<soa>.*<refresh>.*<\/refresh>.*<\/soa>/)
-				expect(req).to.not.match(/<soa>.*<retry>.*<\/retry>.*<\/soa>/)
-				expect(req).to.not.match(/<soa>.*<expire>.*<\/expire>.*<\/soa>/)
-			})
-
-			it('can create a zone with custom SOA', function () {
-				return
-				dns.setZoneSOA({
-					ttl: '3600',
-					refresh: '86400',
-					retry: '7200',
-					expire: '3600000'
-				})
-
-				var req = dns.createZone('example.com')
-
-				expectRequest(req)
-				expect(req).to.match(/<task>.*<zone>.*<\/zone>.*<\/task>/)
-				expect(req).to.match(/<zone>.*<soa>.*<\/soa>.*<\/zone>/)
-				expect(req).to.match(/<soa>.*<level>0<\/level>.*<\/soa>/)
-				expect(req).to.match(/<soa>.*<ttl>3600<\/ttl>.*<\/soa>/)
-				expect(req).to.match(/<soa>.*<refresh>86400<\/refresh>.*<\/soa>/)
-				expect(req).to.match(/<soa>.*<retry>7200<\/retry>.*<\/soa>/)
-				expect(req).to.match(/<soa>.*<expire>3600000<\/expire>.*<\/soa>/)
-				expect(req).to.not.match(/<soa>.*<email>.*<\/email>.*<\/soa>/)
-				expect(req).to.not.match(/<soa>.*<ignore>.*<\/ignore>.*<\/soa>/)
-			})
-
-			it('can create a zone with partial SOA', function () {
-				return
-				dns.setZoneSOA({
-					ttl: '3600',
-					email: 'hostmaster@example.com'
-				})
-
-				var req = dns.createZone('example.com')
-
-				expectRequest(req)
-				expect(req).to.match(/<task>.*<zone>.*<\/zone>.*<\/task>/)
-				expect(req).to.match(/<zone>.*<soa>.*<\/soa>.*<\/zone>/)
-				expect(req).to.match(/<soa>.*<level>0<\/level>.*<\/soa>/)
-				expect(req).to.match(/<soa>.*<ttl>3600<\/ttl>.*<\/soa>/)
-				expect(req).to.match(/<soa>.*<refresh>43200<\/refresh>.*<\/soa>/)
-				expect(req).to.match(/<soa>.*<retry>7200<\/retry>.*<\/soa>/)
-				expect(req).to.match(/<soa>.*<expire>1209600<\/expire>.*<\/soa>/)
-				expect(req).to.match(/<soa>.*<email>hostmaster@example\.com<\/email>.*<\/soa>/)
-				expect(req).to.not.match(/<soa>.*<ignore>.*<\/ignore>.*<\/soa>/)
-
-				dns.setZoneSOA({
-					retry: '600',
-					ignore: '0'
-				})
-
-				var req = dns.createZone('example.com')
-
-				expectRequest(req)
-				expect(req).to.match(/<task>.*<zone>.*<\/zone>.*<\/task>/)
-				expect(req).to.match(/<zone>.*<soa>.*<\/soa>.*<\/zone>/)
-				expect(req).to.match(/<soa>.*<level>0<\/level>.*<\/soa>/)
-				expect(req).to.match(/<soa>.*<ttl>86400<\/ttl>.*<\/soa>/)
-				expect(req).to.match(/<soa>.*<refresh>43200<\/refresh>.*<\/soa>/)
-				expect(req).to.match(/<soa>.*<retry>600<\/retry>.*<\/soa>/)
-				expect(req).to.match(/<soa>.*<expire>1209600<\/expire>.*<\/soa>/)
-				expect(req).to.match(/<soa>.*<ignore>0<\/ignore>.*<\/soa>/)
-				expect(req).to.not.match(/<soa>.*<email>.*<\/email>.*<\/soa>/)
-			})
-
-			it('can create a zone with nameservers', function () {
-				return
+			it('returns an error when SOA has not been defined', function (done) {
 				dns.setZoneNameservers([
-					'ns1.example.com',
-					{ name: 'ns2.example.com' },
-					{ name: 'ns3.example.com', ttl: 3600 }
+					'a.demo.autodns.com',
+					'b.demo.autodns.com'
 				])
 
-				var req = dns.createZone('example.com')
+				dns.createZone('example.com', null, function (err, res) {
+					expect(err).to.exist
+					expect(err).to.have.property('code', 'EF02057', err.toString())
+					done()
+				})
+			})
 
-				expectRequest(req)
-				expect(req).to.match(/<task>.*<zone>.*<\/zone>.*<\/task>/)
-				expect(req).to.match(/<zone>.*<nserver><name>ns1\.example\.com<\/name><\/nserver>.*<\/zone>/)
-				expect(req).to.match(/<zone>.*<nserver><name>ns2\.example\.com<\/name><\/nserver>.*<\/zone>/)
-				expect(req).to.match(/<zone>.*<nserver><name>ns3\.example\.com<\/name><ttl>3600<\/ttl><\/nserver>.*<\/zone>/)
+			it('can create an empty zone', function (done) {
+				dns.setZoneSOA({
+					level: '1',
+					email: 'node-autodns@devnullmail.com'
+				})
+
+				dns.createZone('example.com', null, function (err, res) {
+					expect(err).to.not.exist
+					expect(res).to.exists
+					expect(res).to.have.deep.property('status.code', 'S0201')
+					done()
+				})
+			})
+
+			it('returns an error when creating a duplicate zone', function (done) {
+				dns.createZone('example.com', null, function (err, res) {
+					expect(err).to.exist
+					expect(err).to.have.property('code', 'EF02019', err.toString())
+					done()
+				})
 			})
 		})
 	})

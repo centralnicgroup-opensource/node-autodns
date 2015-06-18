@@ -10,7 +10,7 @@ function AutoDNS (opts) {
 		auth: {
 			user: opts.user,
 			password: opts.password,
-			context: opts.context
+			context: opts.context || '1'
 		}
 	}
 
